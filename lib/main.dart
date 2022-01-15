@@ -56,88 +56,35 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  FlutterFeathersjs flutterFeathersjs = FlutterFeathersjs()
-    ..init(baseUrl: 'https://auction-websocket.ap.ngrok.io');
-
-  StreamSubscription<FeathersJsEventData<AnnouncementMessage>>?
-      streamSubscription;
+  AuctionWebSocketProvider? provider;
 
   void _invokeWithFeatherPackage() async {
-    try {
-      var user = flutterFeathersjs.authenticate(
-          userName: 'test01@gmail.com',
-          password: '@AxTest01',
-          strategy: 'local');
-    } on FeatherJsError catch (e) {
-      if (e.type == FeatherJsErrorType.IS_INVALID_CREDENTIALS_ERROR) {
-        print('');
-      } else if (e.type == FeatherJsErrorType.IS_INVALID_STRATEGY_ERROR) {
-        print('');
-      } else if (e.type == FeatherJsErrorType.IS_AUTH_FAILED_ERROR) {
-        print('');
-      }
-    }
+    // test FeatherJSHelper
+    FeatherjsHelper().setAccessToken(
+        token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpYXQiOjE2NDIyMjg1NzEsImV4cCI6MTY0NDgyMDU3MSwiYXVkIjoiaHR0cHM6Ly9hcGlkZXYuYXVjdGlvbmV4cHJlc3MuY28udGgiLCJpc3MiOiJmZWF0aGVycyIsInN1YiI6IjIiLCJqdGkiOiJmZmQ2NmYxOS04ZmRmLTRlOGYtYjE5NS1iN2YzODE4NjQxN2QifQ.l7APixEYDxx4BpgW4yFwX4RUyCDpmv8a1ql-g_z1OYE');
 
-    var serviceName = 'api/auction_sequence_announcement';
-    var messageResponse = await flutterFeathersjs.find(
-      serviceName: serviceName,
-      query: {
-        'auction_sequence_id': 1,
-      },
-    );
-
-    print(messageResponse);
-
-    streamSubscription = flutterFeathersjs
-        .listen<AnnouncementMessage>(
-      serviceName: serviceName,
-      fromJson: AnnouncementMessage.fromMap,
-    )
-        .listen((FeathersJsEventData<AnnouncementMessage> event) {
-      // event is FeathersJsEventData<Message>
-      // What event is sent by feathers js ?
-      if (event.type == FeathersJsEventType.created) {
-        // Trigger flutter_bloc event
-        //add(FeatherCreatedMessageEvent(message: event));
-        print('');
-      } else if (event.type == FeathersJsEventType.removed) {
-        print('');
-      } else if (event.type == FeathersJsEventType.patched) {
-        print('');
-      }
-    });
-    // streamSubscription?.onData(
-    //   (event) {
-    //     // event is FeathersJsEventData<Message>
-    //     // What event is sent by feathers js ?
-    //     if (event.type == FeathersJsEventType.created) {
-    //       // Trigger flutter_bloc event
-    //       //add(FeatherCreatedMessageEvent(message: event));
-    //       print('');
-    //     } else if (event.type == FeathersJsEventType.removed) {
-    //       print('');
-    //     } else if (event.type == FeathersJsEventType.patched) {
-    //       print('');
-    //     }
-    //   },
-    // );
+    await provider?.connect();
+    await provider?.subscribeStreamAnnouncment(1);
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    provider = context.read<AuctionWebSocketProvider>();
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Container(),
+      body: Container(
+        child: Consumer<AuctionWebSocketProvider>(
+          builder: (context, provider, child) {
+            return Text(provider.annoucementMessage!);
+          },
+        ),
+      ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feathersjs/flutter_feathersjs.dart';
@@ -8,6 +10,77 @@ import '../annoucement_message.dart';
 import 'auction_web_socket_util.dart';
 
 class AuctionWebSocketProvider extends ChangeNotifier {
+  FlutterFeathersjs flutterFeathersjs = FlutterFeathersjs()
+    ..init(baseUrl: AuctionWebSocketUtil.endpoint);
+
+  StreamSubscription<FeathersJsEventData<AnnouncementMessage>>?
+      streamSubscriptionAnnouncement;
+  String? annoucementMessage = '';
+
+  Future<void> connect({String token = ''}) async {
+    var _token;
+
+    if (token.isNotEmpty) {
+      _token = token;
+    } else {
+      _token = await FeatherjsHelper().getAccessToken();
+    }
+
+    try {
+      var helper = FeatherjsHelper();
+      helper.setAccessToken(
+        token: _token,
+      );
+
+      var isAuthenticate = await flutterFeathersjs.scketio.authWithJWT();
+    } on FeatherJsError catch (e) {
+      if (e.type == FeatherJsErrorType.IS_INVALID_CREDENTIALS_ERROR) {
+        print('${e.message}');
+      } else if (e.type == FeatherJsErrorType.IS_INVALID_STRATEGY_ERROR) {
+        print('${e.message}');
+      } else if (e.type == FeatherJsErrorType.IS_AUTH_FAILED_ERROR) {
+        print('${e.message}');
+      }
+    }
+  }
+
+  void streamAuctionSequenceCar() {}
+
+  Future<void> subscribeStreamAnnouncment(int auctionSquenceId) async {
+    var serviceName = AuctionWebSocketUtil
+        .auctionWebSocket.serviceNameAuctionSequenceAnnouncement;
+
+    // establish connection
+    var messageResponse = await flutterFeathersjs.find(
+      serviceName: serviceName,
+      query: {
+        'auction_sequence_id': 1,
+      },
+    );
+
+    // what if cannot subscribe
+
+    // subscribe
+    streamSubscriptionAnnouncement = flutterFeathersjs
+        .listen<AnnouncementMessage>(
+      serviceName: serviceName,
+      fromJson: AnnouncementMessage.fromMap,
+    )
+        .listen((FeathersJsEventData<AnnouncementMessage> event) {
+      // event is FeathersJsEventData<Message>
+      // What event is sent by feathers js ?
+      if (event.type == FeathersJsEventType.patched) {
+        annoucementMessage = event.data?.annoucementText;
+        notifyListeners();
+      }
+      // else if (event.type == FeathersJsEventType.removed) {
+      //   print('');
+      // } else if (event.type == FeathersJsEventType.created) {
+      //   print('');
+      // }
+    });
+  }
+
   Future<void> auctionSequenceCar(
     int auctionSequenceId,
     int auctionSequenceCarId,
