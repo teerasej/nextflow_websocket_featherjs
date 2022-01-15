@@ -5,9 +5,20 @@ import 'package:flutter_feathersjs/flutter_feathersjs.dart';
 import 'package:flutter_feathersjs/src/helper.dart';
 import 'package:nextflow_websocket_featherjs/annoucement_message.dart';
 import 'package:nextflow_websocket_featherjs/message.dart';
+import 'package:nextflow_websocket_featherjs/providers/auction_web_socket.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (BuildContext context) {
+          return AuctionWebSocketProvider();
+        })
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
