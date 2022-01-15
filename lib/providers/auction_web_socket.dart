@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feathersjs/flutter_feathersjs.dart';
+import 'package:nextflow_websocket_featherjs/auction_sequence_car_message.dart';
 import 'package:nextflow_websocket_featherjs/providers/auction_web_socket_util.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -15,7 +16,15 @@ class AuctionWebSocketProvider extends ChangeNotifier {
 
   StreamSubscription<FeathersJsEventData<AnnouncementMessage>>?
       streamSubscriptionAnnouncement;
-  String? annoucementMessage = '';
+  String? annoucementMessage;
+
+  StreamSubscription<FeathersJsEventData<AuctionSequenceCarMessage>>?
+      streamSubscriptionAuctionSequenceCar;
+  AuctionSequenceCarMessage? auctionSequenceCarMessage;
+
+  AuctionWebSocketProvider() : super() {
+    annoucementMessage = '';
+  }
 
   Future<void> connect({String token = ''}) async {
     var _token;
@@ -44,7 +53,40 @@ class AuctionWebSocketProvider extends ChangeNotifier {
     }
   }
 
-  void streamAuctionSequenceCar() {}
+  Future<void> subscribeStreamAuctionSequenceCar(int auctionSquenceId) async {
+    var serviceName =
+        AuctionWebSocketUtil.auctionWebSocket.serviceNameAuctionSequenceCar;
+
+    // establish connection
+    var messageResponse = await flutterFeathersjs.find(
+      serviceName: serviceName,
+      query: {
+        'auction_sequence_car_id': auctionSquenceId,
+      },
+    );
+
+    var auctionSequenceCar = AuctionSequenceCarMessage.fromMap(messageResponse);
+
+    // subscribe
+    streamSubscriptionAuctionSequenceCar = flutterFeathersjs
+        .listen<AuctionSequenceCarMessage>(
+      serviceName: serviceName,
+      fromJson: AuctionSequenceCarMessage.fromMap,
+    )
+        .listen((FeathersJsEventData<AuctionSequenceCarMessage> event) {
+      // event is FeathersJsEventData<Message>
+      // What event is sent by feathers js ?
+      if (event.type == FeathersJsEventType.patched) {
+        auctionSequenceCarMessage = event.data;
+        notifyListeners();
+      }
+      // else if (event.type == FeathersJsEventType.removed) {
+      //   print('');
+      // } else if (event.type == FeathersJsEventType.created) {
+      //   print('');
+      // }
+    });
+  }
 
   Future<void> subscribeStreamAnnouncment(int auctionSquenceId) async {
     var serviceName = AuctionWebSocketUtil
@@ -54,7 +96,7 @@ class AuctionWebSocketProvider extends ChangeNotifier {
     var messageResponse = await flutterFeathersjs.find(
       serviceName: serviceName,
       query: {
-        'auction_sequence_id': 1,
+        'auction_sequence_id': auctionSquenceId,
       },
     );
 
