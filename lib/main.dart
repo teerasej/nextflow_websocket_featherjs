@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_feathersjs/flutter_feathersjs.dart';
+import 'package:flutter_feathersjs/src/helper.dart';
+import 'package:nextflow_websocket_featherjs/annoucement_message.dart';
+import 'package:nextflow_websocket_featherjs/message.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,7 +46,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   FlutterFeathersjs flutterFeathersjs = FlutterFeathersjs()
-    ..init(baseUrl: 'http://175c-183-88-190-139.ngrok.io');
+    ..init(baseUrl: 'https://auction-websocket.ap.ngrok.io');
+
+  StreamSubscription<FeathersJsEventData<AnnouncementMessage>>?
+      streamSubscription;
 
   void _invokeWithFeatherPackage() async {
     var serviceName = 'api/auction_sequence_announcement';
@@ -53,6 +61,40 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     print(messageResponse);
+
+    streamSubscription = flutterFeathersjs
+        .listen<AnnouncementMessage>(
+      serviceName: serviceName,
+      fromJson: AnnouncementMessage.fromMap,
+    )
+        .listen((FeathersJsEventData<AnnouncementMessage> event) {
+      // event is FeathersJsEventData<Message>
+      // What event is sent by feathers js ?
+      if (event.type == FeathersJsEventType.created) {
+        // Trigger flutter_bloc event
+        //add(FeatherCreatedMessageEvent(message: event));
+        print('');
+      } else if (event.type == FeathersJsEventType.removed) {
+        print('');
+      } else if (event.type == FeathersJsEventType.patched) {
+        print('');
+      }
+    });
+    // streamSubscription?.onData(
+    //   (event) {
+    //     // event is FeathersJsEventData<Message>
+    //     // What event is sent by feathers js ?
+    //     if (event.type == FeathersJsEventType.created) {
+    //       // Trigger flutter_bloc event
+    //       //add(FeatherCreatedMessageEvent(message: event));
+    //       print('');
+    //     } else if (event.type == FeathersJsEventType.removed) {
+    //       print('');
+    //     } else if (event.type == FeathersJsEventType.patched) {
+    //       print('');
+    //     }
+    //   },
+    // );
   }
 
   @override
