@@ -52,6 +52,21 @@ class _MyHomePageState extends State<MyHomePage> {
       streamSubscription;
 
   void _invokeWithFeatherPackage() async {
+    try {
+      var user = flutterFeathersjs.authenticate(
+          userName: 'test01@gmail.com',
+          password: '@AxTest01',
+          strategy: 'local');
+    } on FeatherJsError catch (e) {
+      if (e.type == FeatherJsErrorType.IS_INVALID_CREDENTIALS_ERROR) {
+        print('');
+      } else if (e.type == FeatherJsErrorType.IS_INVALID_STRATEGY_ERROR) {
+        print('');
+      } else if (e.type == FeatherJsErrorType.IS_AUTH_FAILED_ERROR) {
+        print('');
+      }
+    }
+
     var serviceName = 'api/auction_sequence_announcement';
     var messageResponse = await flutterFeathersjs.find(
       serviceName: serviceName,
