@@ -77,14 +77,8 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: _invokeWithFeatherPackage,
             child: const Text('feather'),
           ),
-          FloatingActionButton(
-            onPressed: _invokeWithSocketIOPackage,
-            child: const Text('socket io'),
-          ),
         ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
-
-  void _invokeWithSocketIOPackage() {}
 }
