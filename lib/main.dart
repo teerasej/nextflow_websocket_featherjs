@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   FlutterFeathersjs flutterFeathersjs = FlutterFeathersjs()
     ..init(baseUrl: 'http://175c-183-88-190-139.ngrok.io');
 
-  void _incrementCounter() async {
+  void _invokeWithFeatherPackage() async {
     var serviceName = 'api/auction_sequence_announcement';
     var messageResponse = await flutterFeathersjs.find(
       serviceName: serviceName,
@@ -74,13 +74,11 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: _incrementCounter,
-            tooltip: 'Increment',
+            onPressed: _invokeWithFeatherPackage,
             child: const Text('feather'),
           ),
           FloatingActionButton(
-            onPressed: _socketIO,
-            tooltip: 'Increment',
+            onPressed: _invokeWithSocketIOPackage,
             child: const Text('socket io'),
           ),
         ],
@@ -88,5 +86,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _socketIO() {}
+  void _invokeWithSocketIOPackage() {}
 }
