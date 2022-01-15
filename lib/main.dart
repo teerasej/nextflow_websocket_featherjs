@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feathersjs/flutter_feathersjs.dart';
 import 'package:flutter_feathersjs/src/helper.dart';
 import 'package:nextflow_websocket_featherjs/annoucement_message.dart';
+import 'package:nextflow_websocket_featherjs/auction_sequence_car_message.dart';
 import 'package:nextflow_websocket_featherjs/message.dart';
 import 'package:nextflow_websocket_featherjs/providers/auction_web_socket.dart';
 import 'package:provider/provider.dart';
@@ -80,10 +81,24 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Container(
-        child: Consumer<AuctionWebSocketProvider>(
-          builder: (context, provider, child) {
-            return Text(provider.annoucementMessage!);
-          },
+        child: Column(
+          children: [
+            Selector<AuctionWebSocketProvider, String?>(
+              selector: (_, provider) => provider.annoucementMessage,
+              builder: (context, value, child) {
+                if (value == null) value = '';
+                return Text(value);
+              },
+            ),
+            Selector<AuctionWebSocketProvider, AuctionSequenceCarMessage?>(
+              selector: (_, provider) => provider.auctionSequenceCarMessage,
+              builder: (context, value, child) {
+                if (value == null) return Text('nothing here...');
+
+                return Text(value.auctionStatus ?? 'null');
+              },
+            ),
+          ],
         ),
       ),
       floatingActionButton: Column(
