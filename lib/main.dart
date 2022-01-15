@@ -62,10 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
     // test FeatherJSHelper
     FeatherjsHelper().setAccessToken(
         token:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpYXQiOjE2NDIyMjg1NzEsImV4cCI6MTY0NDgyMDU3MSwiYXVkIjoiaHR0cHM6Ly9hcGlkZXYuYXVjdGlvbmV4cHJlc3MuY28udGgiLCJpc3MiOiJmZWF0aGVycyIsInN1YiI6IjIiLCJqdGkiOiJmZmQ2NmYxOS04ZmRmLTRlOGYtYjE5NS1iN2YzODE4NjQxN2QifQ.l7APixEYDxx4BpgW4yFwX4RUyCDpmv8a1ql-g_z1OYE');
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpYXQiOjE2NDIyMzc3NTAsImV4cCI6MTY0NDgyOTc1MCwiYXVkIjoiaHR0cHM6Ly9hcGlkZXYuYXVjdGlvbmV4cHJlc3MuY28udGgiLCJpc3MiOiJmZWF0aGVycyIsInN1YiI6IjIiLCJqdGkiOiI2YWM3NWExNi0zMmRiLTQ1MmMtYjEwOC02M2M3M2NjMDdkZGQifQ.K2tDM350K-Z2_wWWXs8fl4Rf0vGD6ZBDnSycg8X9nkw');
 
     await provider?.connect();
     await provider?.subscribeStreamAnnouncment(1);
+    await provider?.subscribeStreamAuctionSequenceCar(1);
   }
 
   @override
