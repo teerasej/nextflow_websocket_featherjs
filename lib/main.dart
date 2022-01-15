@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feathersjs/flutter_feathersjs.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 void main() {
   runApp(const MyApp());
@@ -42,6 +43,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   FlutterFeathersjs flutterFeathersjs = FlutterFeathersjs()
     ..init(baseUrl: 'http://175c-183-88-190-139.ngrok.io');
+
+  IO.Socket socket = IO.io('http://175c-183-88-190-139.ngrok.io');
 
   void _invokeWithFeatherPackage() async {
     var serviceName = 'api/auction_sequence_announcement';
@@ -86,5 +89,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _invokeWithSocketIOPackage() {}
+  void _invokeWithSocketIOPackage() {
+    socket.onConnect((_) {
+      print('connect');
+      socket.emit('msg', 'test');
+    });
+    socket.on('event', (data) => print(data));
+    socket.onDisconnect((_) => print('disconnect'));
+    socket.on('fromServer', (_) => print(_));
+  }
 }
